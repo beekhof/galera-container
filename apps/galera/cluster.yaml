@@ -1,0 +1,49 @@
+apiVersion: clusterlabs.org/v1alpha1
+kind: ReplicatedStatefulSet
+metadata:
+  # https://github.com/kubernetes/community/blob/master/contributors/devel/api-conventions.md#idempotency
+  generateName: galera-
+  labels:
+    kind: galera
+spec:
+  replicas: 3
+  pod:
+    antiAffinity: true
+  service:
+    name: galera-svc
+    sessionAffinity: None
+  servicePorts:
+  - name: galera
+    port: 13306
+    targetPort: 3306
+    # https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
+  volumes:
+  - emptyDir: {}
+    name: galera-vwsgr-db
+  containers:
+  - name: rss
+    image: quay.io/beekhof/galera:latest
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 3306
+      name: galera
+      protocol: TCP
+      # http://galeracluster.com/documentation-webpages/firewallsettings.html
+      # 3306 For MySQL client connections and State Snapshot Transfer that use the mysqldump method.
+      # 4567 For Galera Cluster replication traffic, multicast replication uses both UDP transport and TCP on this port.
+      # 4568 For Incremental State Transfer.
+      # 4444 For all other State Snapshot Transfer.
+    volumeMounts:
+    - mountPath: /var/galera/data
+      name: galera-vwsgr-db
+  commands:
+    sequence:
+    - /sequence.sh
+    primary:
+    - /start.sh
+    seed:
+    - /seed.sh
+    status:
+    - /check.sh
+    stop:
+    - /stop.sh
