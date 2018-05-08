@@ -18,7 +18,7 @@ RUN chmod g+w /etc/passwd
 ENV GOPATH=/go POD_USER=${POD_USER:-mysql}
 RUN go get k8s.io/apimachinery/pkg/util/sets/
 
-ENTRYPOINT /fixuser_and_run.sh
+ENTRYPOINT ["/fixuser_and_run.sh"]
 CMD ["/bin/go", "run", "/peer-finder.go", "-on-change", "/on-change.sh"]
 
 USER $POD_USER
