@@ -20,5 +20,4 @@ fi
 # Now run the configured command
 #
 echo Running: $*
-shift
 $*
