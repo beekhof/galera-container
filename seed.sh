@@ -100,7 +100,8 @@ fi
 # TODO: Drop root@localhost user or leave for the admin to decide?
 log_info 'Initialization finished'
 
-# TODO: Remove - Tiny DB for testing
-$MYSQL  $mysql_flags -D "${MYSQL_DATABASE}" -B < database.sql
+if [ "${MYSQL_DATABASE}" = "sample" ]; then
+    $MYSQL  $mysql_flags -D "${MYSQL_DATABASE}" -B < database.sql
+fi
 
 handle_result "seed" 0
